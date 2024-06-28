@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/constants/colors.dart';
+
 import 'package:todo_app/page_views/home_page.dart';
 
 void main() {

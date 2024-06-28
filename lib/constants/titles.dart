@@ -1,4 +1,4 @@
-import 'package:flutter/src/widgets/editable_text.dart';
+
 
 class Titles{
   String title1;

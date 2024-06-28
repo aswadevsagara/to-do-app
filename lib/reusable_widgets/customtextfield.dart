@@ -24,10 +24,10 @@ class TextFields extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       validator: (value) {
-        if(value==null||value.isEmpty){
-              return "value is empty";   
-        }else{
-       return null;
+        if (value == null || value.isEmpty) {
+          return "value is empty";
+        } else {
+          return null;
         }
       },
       controller: controller,
@@ -41,7 +41,8 @@ class TextFields extends StatelessWidget {
             fontSize: fontSize,
           ),
           contentPadding: EdgeInsets.symmetric(vertical: verticalhgt!),
-          enabledBorder: const OutlineInputBorder(
+          
+          border: const OutlineInputBorder(
               borderSide: BorderSide(color: black),
               borderRadius: BorderRadius.all(
                 Radius.circular(16),

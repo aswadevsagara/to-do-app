@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/constants/strings.dart';
 import 'package:todo_app/reusable_widgets/customtextfield.dart';
@@ -19,14 +17,15 @@ class PageHome extends StatefulWidget {
 class _PageHomeState extends State<PageHome> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-
+ bool isButton = false;
   List<Titles> titles = List.empty(growable: true);
 
   int selectedIndex = 1;
-  GlobalKey<FormState> formKey= GlobalKey<FormState>(); 
-  
+  final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: liteYellow,
@@ -42,7 +41,7 @@ class _PageHomeState extends State<PageHome> {
             // textfield_1 //
 
             Form(
-              key:formKey ,
+              key: formKey,
               child: TextFields(
                 formKey: formKey,
                 controller: titleController,
@@ -74,43 +73,50 @@ class _PageHomeState extends State<PageHome> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                CustomButton(
-                  onPressed: () {
-                   if(formKey.currentState!.validate()){
-                     String title = titleController.text.trim();
-                    String description1 = descriptionController.text.trim();
-                    if (title.isNotEmpty) {
-                      setState(() {
-                        titleController.text = "";
-                        descriptionController.text = "";
-                        titles.add(
-                            Titles(title1: title, description: description1));
-                      });
-                    }
-                   }
-                  },
-                  text: "save",
+                Visibility(
+                  visible: !isButton,
+                  child: CustomButton(
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        String title = titleController.text.trim();
+                        String description1 = descriptionController.text.trim();
+                        if (title.isNotEmpty) {
+                          setState(() {
+                            titleController.text = "";
+                            descriptionController.text = "";
+                            titles.add(Titles(
+                                title1: title, description: description1));
+                          });
+                        }
+                      }
+                    },
+                    text: "save",
+                  ),
                 ),
-                CustomButton(
-                  onPressed: () {
-                    String title = titleController.text.trim();
-                    String description1 = descriptionController.text.trim();
-                    if (title.isNotEmpty) {
-                      setState(() {
-                        titleController.text = "";
-                        descriptionController.text = "";
-                        titles[selectedIndex].title1 = title;
-                        titles[selectedIndex].description = description1;
-                        selectedIndex = -1;
-                      });
-                    }
-                  },
-                  text: "update",
+                Visibility(
+                  visible: isButton,
+                  child: CustomButton(
+                    onPressed: () {
+                      String title = titleController.text.trim();
+                      String description1 = descriptionController.text.trim();
+                      if (title.isNotEmpty) {
+                        setState(() {
+                          titleController.text = "";
+                          descriptionController.text = "";
+                          titles[selectedIndex].title1 = title;
+                          titles[selectedIndex].description = description1;
+                          selectedIndex = -1;
+                          isButton=false;
+                        });
+                      }
+                    },
+                    text: "update",
+                  ),
                 ),
               ],
             ),
             titles.isEmpty
-                ? Padding(
+                ? const Padding(
                     padding: EdgeInsets.only(top: 30),
                     child: Text(
                       "add something...",
@@ -120,7 +126,15 @@ class _PageHomeState extends State<PageHome> {
                 : Expanded(
                     child: ListView.builder(
                       itemCount: titles.length,
-                      itemBuilder: (context, index) => getRow(index),
+                      itemBuilder: (context, index) => getRow(index,() {
+                        print("hello");
+                         titleController.text = titles[index].title1;
+                  descriptionController.text = titles[index].description;
+                  setState(() {
+                    selectedIndex = index;
+                    isButton=true;
+                  });
+                      }),
                     ),
                   )
           ],
@@ -129,13 +143,16 @@ class _PageHomeState extends State<PageHome> {
     );
   }
 
-  Widget getRow(int index) {
-    return Card( color:titles[index].checkboxValue?liteYellow:Colors.white ,
+  Widget getRow(int index,VoidCallback fun) {
+    return Card(
+      color: titles[index].checkboxValue ? liteYellow : Colors.white,
       child: ListTile(
         leading: Checkbox(
-            value: titles[index].checkboxValue, activeColor: liteYellow, onChanged: (newBool) {
+            value: titles[index].checkboxValue,
+            activeColor: liteYellow,
+            onChanged: (newBool) {
               setState(() {
-               titles[index].checkboxValue=!titles[index].checkboxValue;
+                titles[index].checkboxValue = !titles[index].checkboxValue;
               });
             }),
         title: Column(
@@ -153,13 +170,7 @@ class _PageHomeState extends State<PageHome> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
-                onTap: () {
-                  titleController.text = titles[index].title1;
-                  descriptionController.text = titles[index].description;
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                },
+                onTap:  fun,
                 child: Icon(Icons.edit),
               ),
               InkWell(
